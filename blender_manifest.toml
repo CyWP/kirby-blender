@@ -1,0 +1,12 @@
+schema_version = "0.0.1"
+id = "Kirby"
+version = "0.0.1"
+name = "Kirby"
+tagline = "Somewhat neural style transfer"
+maintainer = "Thomas Wolfgang Peschlow <thomas.p24@live.com>"
+type = "add-on"
+tags = ["Mesh"]
+blender_version_min = "4.2.0"
+license = [
+  "SPDX:GPL-3.0-or-later",
+]

@@ -1,4 +1,5 @@
 import bpy
+from ..utils import ModelManager
 
 class MESH_OT_Process_1(bpy.types.Operator):
     bl_idname = "mesh.process1"
@@ -8,10 +9,11 @@ class MESH_OT_Process_1(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         scene = context.scene
-        return scene.mesh_1 is not None
+        return scene.mesh_1 and ModelManager.is_loaded()
 
     def execute(self, context):
-        # Placeholder processing code
+        ModelManager.set_mesh1(context.scene.mesh_1)
+        ModelManager.process1(context)
         self.report({'INFO'}, f"Processing mesh_1")
         return {'FINISHED'}
 
@@ -23,10 +25,11 @@ class MESH_OT_Process_2(bpy.types.Operator):
     @classmethod
     def poll(cls, context):
         scene = context.scene
-        return scene.mesh_2 is not None
+        return scene.mesh_2 and ModelManager.is_loaded()
 
     def execute(self, context):
-        # Placeholder processing code
+        ModelManager.set_mesh2(context.scene.mesh_2)
+        ModelManager.process2(context)
         self.report({'INFO'}, f"Processing mesh_2")
         return {'FINISHED'}
 
