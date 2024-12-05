@@ -107,9 +107,7 @@ class ModelManager:
         net = cls._model
         net.set_input(cls._mesh1.copy())
         features, newmesh = net.forward()
-        print(f"features, {features, features.shape}")
         name = f"{cls._mesh1['name']}_processed"
-        print("mesh", newmesh.edges)
         return np2mesh(context, newmesh.vs, newmesh.faces, name)
 
     @classmethod
@@ -117,9 +115,7 @@ class ModelManager:
         net = cls._model
         net.set_input(cls._mesh2.copy())
         features, newmesh = net.forward()
-        print(f"features, {features, features.shape}")
         name = f"{cls._mesh2['name']}_processed"
-        print("mesh", newmesh.edges)
         return np2mesh(context, newmesh.vs, newmesh.faces, name)
 
     @classmethod

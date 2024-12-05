@@ -43,6 +43,8 @@ class MeshPool(nn.Module):
 
     def __pool_main(self, mesh_index):
         mesh = self.__meshes[mesh_index]
+        mesh.update_vertex_normals()
+        mesh.new_pool_layer()
         #valid edges kept contiguously at start of tensor
         queue = self.__build_queue(
             self.__fe[mesh_index, :, : mesh.edges_count], mesh.edges_count

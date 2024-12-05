@@ -6,8 +6,8 @@ import numpy as np
 import os
 
 from .mesh_union import MeshUnion
-from .mesh_prepare import fill_mesh
-from .mesh_reconstruction import MeshReconstruction
+from .mesh_prepare import fill_mesh, compute_vertex_normals
+from .mesh_reconstruction import MeshReconstruction, EdgeRestore
 
 
 class Mesh:
@@ -26,6 +26,12 @@ class Mesh:
     def extract_features(self):
         return self.features
 
+    def update_vertex_normals(self):
+        self.vertex_normals = compute_vertex_normals(self)
+
+    def new_pool_layer(self):
+        self.reconstruction.new_layer()
+
     def merge_vertices(self, edge_id):
         self.remove_edge(edge_id)
         edge = self.edges[edge_id]
@@ -33,6 +39,8 @@ class Mesh:
         iv_b = edge[1]
         v_a = self.vs[iv_a]
         v_b = self.vs[iv_b]
+        v1 = v_a
+        v2 = v_b
         # update pA
         v_a.__iadd__(v_b)
         v_a.__itruediv__(2)
@@ -50,6 +58,12 @@ class Mesh:
             else:
                 self.faces[f_idx, np.where(f==iv_b)] = iv_a
                 self.vf[iv_a].append(f_idx)
+        #Record transformation
+        vn_a = self.vertex_normals[iv_a]
+        vn_b = self.vertex_normals[iv_b]
+        vn_new = 0.5*(vn_a+vn_b)
+        disp = v1-v_a
+        self.reconstruction.add_pool(disp, iv_a, iv_b, vn_new)
 
     def remove_vertex(self, v):
         self.v_mask[v] = False

@@ -21,7 +21,7 @@ def fill_mesh(mesh2fill:'Mesh', V:np.array, E:np.array, F:np.array):
     mesh2fill.sides = mesh_data["sides"]
     mesh2fill.vf = mesh_data["vf"]
     mesh2fill.faces_mask = mesh_data["faces_mask"]
-
+    mesh2fill.vertex_normals = mesh_data["vertex_normals"]
 
 class MeshPrep:
     def __getitem__(self, item):
@@ -42,6 +42,7 @@ def from_scratch(V:np.array, E:np.array, F:np.array):
     mesh_data.vf = get_vf(faces, mesh_data.vs.shape[0])
     mesh_data.faces_mask = np.ones((faces.shape[0],), dtype=bool)
     build_gemm(mesh_data, mesh_data.faces, mesh_data.face_areas)
+    mesh_data.vertex_normals = compute_vertex_normals(mesh_data)
     mesh_data.features = extract_features(mesh_data)
     return mesh_data
 
@@ -157,6 +158,18 @@ def compute_face_normals_and_areas(mesh, faces):
     except Exception as e:
         raise Exception(f"Problem with faces in mesh {mesh.filename}: {[f for f in faces]}.\n Exception: {str(e)}")
     return face_normals, face_areas
+
+def compute_vertex_normals(mesh):
+    vertex_normals = np.zeros_like(mesh.vs, dtype=np.float32)
+    face_normals = np.zeros_like(mesh.faces, dtype=np.float32)
+    face_normals[mesh.faces_mask], _ = compute_face_normals_and_areas(mesh, mesh.faces[mesh.faces_mask])
+    # Accumulate face normals to vertices
+    for i, face in enumerate(mesh.faces[mesh.faces_mask]):
+        for vertex_index in face:
+            vertex_normals[vertex_index] += face_normals[i]
+    #nan_rows = np.where(np.any(np.isnan(vertex_normals), axis=1))[0]
+    #print(vertex_normals[mesh.v_mask])
+    return vertex_normals
 
 
 def angles_from_faces(mesh, edge_faces, faces):
